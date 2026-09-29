@@ -5,6 +5,7 @@ from pptx import Presentation
 
 import mermaid2pptx as m2p
 from mermaid2pptx import cli
+from samples import ALL_EXAMPLES
 
 
 def test_author(tmp_path, monkeypatch):
@@ -73,3 +74,9 @@ def test_convert_files_reports_for_a_message_box(tmp_path, capsys, monkeypatch):
     ok, report = cli.convert_files([str(good)])
     assert not ok and "unexpected ZeroDivisionError" in report
     assert capsys.readouterr() == ("", "")                                  # nothing leaks to the console
+
+
+@pytest.mark.parametrize("path", ALL_EXAMPLES, ids=lambda p: p.stem)
+def test_every_example_converts(path, tmp_path, capsys):
+    assert cli.main([str(path), "-o", str(tmp_path / "out.pptx")]) == 0
+    assert "warning" not in capsys.readouterr().err

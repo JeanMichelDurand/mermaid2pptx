@@ -5,7 +5,8 @@ import pytest
 
 from mermaid2pptx.flowchart import parse, to_bpmn
 
-EXAMPLES = sorted((Path(__file__).parent.parent / "examples").glob("*.mmd"))
+ALL_EXAMPLES = sorted((Path(__file__).parent.parent / "examples").glob("*.mmd"))
+EXAMPLES = [p for p in ALL_EXAMPLES if p.read_text(encoding="utf-8").lstrip().startswith(("flowchart", "graph"))]
 
 
 def examples():

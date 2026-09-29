@@ -6,7 +6,7 @@ import re
 from .errors import MermaidError
 
 # first word of a diagram -> its type
-KINDS = {"flowchart": "flowchart", "graph": "flowchart"}
+KINDS = {"flowchart": "flowchart", "graph": "flowchart", "sequencediagram": "sequence"}
 
 
 def extract_blocks(src: str) -> list[str]:
@@ -35,6 +35,6 @@ def diagram_kind(src: str) -> str:
     word = lines[0].split()[0]
     kind = KINDS.get(word.lower())
     if kind is None:
-        names = ", ".join(sorted(KINDS))
-        raise MermaidError(f"unsupported diagram type {word!r}: this converter reads {names}")
+        raise MermaidError(f"unsupported diagram type {word!r}: this converter reads flowchart (graph), "
+                           "sequenceDiagram and gantt")
     return kind

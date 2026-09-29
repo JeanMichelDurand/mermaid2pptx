@@ -20,6 +20,12 @@ All notable changes to this project are recorded here. The format follows
 
 ### Added
 
+- **Sequence diagrams** (`sequenceDiagram`): participants and actors, dashed lifelines glued to
+  the participant boxes (drawn again at the bottom), every Mermaid arrow (`->>`, `-->>`, `-x`,
+  `-)`, `<<->>`…), messages to oneself, activation bars (`+`/`-`, `activate`), notes,
+  `loop`/`alt`/`opt`/`par`/`critical`/`break` blocks, `rect` backgrounds, `box` groups,
+  `autonumber` and `title`. Example: `examples/sequence.mmd`.
+
 - A browser version, published on GitHub Pages: https://jeanmicheldurand.github.io/mermaid2pptx/. It runs the converter
   in the page with Pyodide, for users who cannot install or run programs.
 - Signing of the Windows executable through SignPath, enabled once the project is approved
