@@ -1,0 +1,86 @@
+# Push a tag matching the version in mermaid2pptx.py (git tag v1.0.0 && git push --tags):
+# builds one standalone executable per OS (no Python needed to run it) and attaches them
+# to a GitHub release.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04          # oldest glibc still hosted: the binary runs on newer distros
+            asset: mermaid2pptx-linux-x86_64
+          - os: windows-latest
+            asset: mermaid2pptx-windows-x86_64.exe
+          - os: macos-latest
+            asset: mermaid2pptx-macos-arm64
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: tag matches the version
+        run: |
+          version=$(python -c "import ast, sys; t = ast.parse(open('mermaid2pptx.py', encoding='utf-8').read()); print(next(n.value.value for n in t.body if isinstance(n, ast.Assign) and n.targets[0].id == '__version__'))")
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != v$version"; exit 1; }
+      - run: python -m pip install -r requirements-dev.txt pyinstaller
+      - run: python -m pytest
+      - name: build
+        run: pyinstaller --onefile --name mermaid2pptx --collect-data pptx mermaid2pptx.py
+      - name: smoke test the executable
+        run: |
+          exe=$(ls dist/mermaid2pptx*)
+          "$exe" --version
+          "$exe" examples/incident_lanes.mmd -o smoke.pptx
+          test -s smoke.pptx
+          mv "$exe" "dist/${{ matrix.asset }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+
+  # Trusted publishing, no token: on pypi.org, add a "pending publisher" for project mermaid2pptx
+  # with this repository, workflow release.yml and environment pypi (once, before the first tag).
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/mermaid2pptx
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: build the sdist and wheel
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check --strict dist/*
+      - uses: pypa/gh-action-pypi-publish@release/v1

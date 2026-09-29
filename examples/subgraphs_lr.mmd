@@ -1,0 +1,15 @@
+flowchart LR
+    subgraph db [HR database]
+        E[EMP] & D[DEPT]
+    end
+    subgraph rep [Reporting]
+        V[Employees by department] --> R[Payroll report]
+        V --> P[HR portal]
+    end
+    E --> V
+    D --> V
+    R ==> S[Board slides]
+    P --> S
+    P --> E
+    classDef hot fill:#FDE68A,stroke:#B45309
+    class R hot

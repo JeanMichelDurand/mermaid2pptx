@@ -1,0 +1,19 @@
+flowchart RL
+  subgraph hire [Recruiting]
+    direction RL
+    s1[Job posting] --> b1[Applications]
+    s2[Referrals] --> b1
+    s3[Internal mobility] --> b2[Transfer requests]
+  end
+  subgraph select [Selection]
+    b1 --> sv1[Interviews]
+    b2 --> sv2[Manager approval]
+    sv1 & sv2 --> g1[Offer letter]
+    sv2 --> g2[Team assignment]
+  end
+  subgraph onboard [Onboarding]
+    g1 --> d1[Contract signed] & d2[Welcome day]
+    g2 --> m1[Training plan] --> d1
+  end
+  d2 -.->|feedback| s1
+  m1 --> m1

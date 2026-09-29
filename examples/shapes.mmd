@@ -1,0 +1,15 @@
+%% every node shape, edge style and a self-loop
+graph BT
+    a[rect] --> b(round) --> c([stadium])
+    a --- d[[subroutine]]
+    d -.-> e[(cylinder)]
+    e == thick label ==> f((circle))
+    c --o g{diamond}
+    g -- a longer edge label that wraps --> h{{hexagon}}
+    f --x i[/parallelogram/]
+    i <--> j[\alt parallelogram\]
+    j --> k[/trapezoid\] & l[\alt trapezoid/]
+    k --> m>flag] --> n(((double)))
+    n --> n
+    l ~~~ m
+    style g fill:#dbeafe,stroke:#1d4ed8,stroke-width:2px

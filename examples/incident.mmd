@@ -1,0 +1,11 @@
+graph TD
+ A[Customer reports an issue] --> B{Contact channel}
+ B -->|Email| C[Ticketing tool]
+ B -->|Phone| C
+ B -->|Web portal| C
+ C --> D[Assign to an agent]
+ D --> E[Handle the request]
+ E --> F{Escalation needed?}
+ F -->|Yes| G[Escalate to the next level]
+ G --> E
+ F -->|No| H[Resolve and close]

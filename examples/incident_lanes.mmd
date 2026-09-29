@@ -1,0 +1,44 @@
+graph TD
+    %% BPMN-like styles
+    classDef startEvent fill:#d4edda,stroke:#28a745,stroke-width:2px,stroke-dasharray: 0;
+    classDef endEvent fill:#f8d7da,stroke:#dc3545,stroke-width:3px;
+    classDef gateway fill:#fff3cd,stroke:#ffc107,stroke-width:2px;
+    classDef activity fill:#e2e3e5,stroke:#383d41,stroke-width:1px,rx:5px,ry:5px;
+
+    %% Swim lanes
+    subgraph Customer["👤 Customer"]
+        Start(( )):::startEvent
+        Contact["👤 Contact the front office"]:::activity
+        Start --> Contact
+    end
+
+    subgraph Desk["Service desk / Ticketing tool"]
+        Channel{Contact<br/>channel}:::gateway
+        Ticket[Create the ticket]:::activity
+        Assign[Assign to an agent]:::activity
+    end
+
+    subgraph Support["Support team (L1 / L2)"]
+        Handle[Handle the request]:::activity
+        Escalate{Escalation<br/>needed?}:::gateway
+        Expert[Escalate to the next level]:::activity
+        End(( )):::endEvent
+        Resolve[Resolve and close]:::activity
+    end
+
+    %% Flows between lanes
+    Contact --> Channel
+
+    Channel -->|Email| Ticket
+    Channel -->|Phone| Ticket
+    Channel -->|Web portal| Ticket
+
+    Ticket --> Assign
+    Assign --> Handle
+
+    Handle --> Escalate
+    Escalate -->|Yes| Expert
+    Expert --> Handle
+    Escalate -->|No| Resolve
+
+    Resolve --> End:::endEvent

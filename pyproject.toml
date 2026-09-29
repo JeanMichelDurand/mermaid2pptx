@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mermaid2pptx"
+dynamic = ["version"]
+description = "Convert Mermaid flowcharts into native, editable PowerPoint shapes (BPMN-style by default)"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["python-pptx>=1.0.2,<2"]
+keywords = ["mermaid", "powerpoint", "pptx", "flowchart", "bpmn", "diagram"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Multimedia :: Graphics :: Presentation",
+]
+
+[project.urls]
+Homepage = "https://github.com/JeanMichelDurand/mermaid2pptx"
+Issues = "https://github.com/JeanMichelDurand/mermaid2pptx/issues"
+Changelog = "https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pyinstaller>=6"]
+
+[project.scripts]
+mermaid2pptx = "mermaid2pptx:main"
+
+[tool.setuptools]
+py-modules = ["mermaid2pptx"]
+
+[tool.setuptools.dynamic]
+version = { attr = "mermaid2pptx.__version__" }

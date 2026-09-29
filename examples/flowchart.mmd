@@ -1,0 +1,12 @@
+flowchart TD
+    A([Start]) --> B[Submit a leave request]
+    B --> C{Enough days left?}
+    C -->|Yes| D[Manager approves]
+    C -->|No| E[Decline the request]
+    D --> F[(HR records)]
+    D --> G[/Notify the employee/]
+    F --> H{{Plan the absence}}
+    G --> H
+    H -.-> B
+    E --> I((End))
+    H --> I
