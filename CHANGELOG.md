@@ -8,6 +8,13 @@ All notable changes to this project are recorded here. The format follows
 
 ## [1.0.1] - 2026-09-29
 
+### Added
+
+- A browser version, published on GitHub Pages: https://jeanmicheldurand.github.io/mermaid2pptx/. It runs the converter
+  in the page with Pyodide, for users who cannot install or run programs.
+- Signing of the Windows executable through SignPath, enabled once the project is approved
+  (`CODE_SIGNING.md`).
+
 ### Changed
 
 - The Windows executable, double-clicked, opens a file dialog instead of printing the command-line

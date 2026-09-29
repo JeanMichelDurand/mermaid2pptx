@@ -33,6 +33,14 @@ its connectors follow. `docs/screenshots.sh` regenerates these images.
 
 ## Install
 
+### Option 0: nothing to install, in your browser
+
+Open **[the web version](https://jeanmicheldurand.github.io/mermaid2pptx/)**, paste or drop your `.mmd` file, and click *Convert to
+PowerPoint*. It runs the same converter inside the page (Python compiled for the browser, with
+[Pyodide](https://pyodide.org)): your diagram never leaves your computer, and no admin rights,
+Python or executable are needed. This is the way to go on a locked-down work PC, where Windows
+*Smart App Control* or IT policies block unsigned programs.
+
 ### Option 1: download the executable (no Python, no admin rights)
 
 Take the file for your system from the [latest release](https://github.com/JeanMichelDurand/mermaid2pptx/releases/latest):
@@ -48,7 +56,10 @@ Nothing to install: put it in any folder you can write to.
 - **Windows.** Double-click `mermaid2pptx-windows-x86_64.exe` and choose one or more `.mmd` files,
   or drag the files onto it. Each `.pptx` is written next to its `.mmd`, and a message offers to
   open them in PowerPoint. The first run may show "Windows protected your PC", because the file
-  is not signed: *More info* → *Run anyway*. From a command prompt, it is the command line below.
+  is not signed yet: *More info* → *Run anyway*. With *Smart App Control* on (Windows 11), an
+  unsigned program cannot be run at all: use the browser version above. See the
+  [code signing policy](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CODE_SIGNING.md). From a command prompt, it is the
+  command line below.
 - **Linux / macOS.** `chmod +x mermaid2pptx-*` once. On macOS, the first run is blocked as
   "unidentified developer": `xattr -d com.apple.quarantine mermaid2pptx-macos-arm64`.
 
