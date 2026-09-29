@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from pptx import Presentation
 
-from . import flowchart, sequence
+from . import flowchart, gantt, sequence
 from .options import Options
 from .source import diagram_kind
 
-_CONVERTERS = {"flowchart": flowchart.convert, "sequence": sequence.convert}
+_CONVERTERS = {"flowchart": flowchart.convert, "sequence": sequence.convert, "gantt": gantt.convert}
 
 
 def convert(src: str, opts: Options | None = None) -> tuple[Presentation, object, object]:

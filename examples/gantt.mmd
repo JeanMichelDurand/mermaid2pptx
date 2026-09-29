@@ -1,0 +1,21 @@
+gantt
+    title Onboarding a new employee
+    dateFormat YYYY-MM-DD
+    axisFormat %d %b
+    excludes weekends
+
+    section Before day one
+    Sign the contract            :done, contract, 2026-03-02, 3d
+    Order laptop and badge       :done, kit, after contract, 5d
+    Create accounts              :active, accounts, after contract, 4d
+
+    section First week
+    Welcome and site tour        :milestone, day1, 2026-03-16, 0d
+    Meet the team                :team, 2026-03-16, 2d
+    Security training            :crit, security, after team, 1d
+    Set up the workstation       :after security, 2d
+
+    section First month
+    Shadow a colleague           :shadow, 2026-03-23, 2w
+    First project                :project, after shadow, 10d
+    Review with the manager      :milestone, review, after project, 0d

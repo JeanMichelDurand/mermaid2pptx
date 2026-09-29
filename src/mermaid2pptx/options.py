@@ -7,17 +7,20 @@ from pptx.enum.dml import MSO_THEME_COLOR
 
 from .styles import contrast, parse_color
 
-# node_*: boxes; accent: event outlines; text: labels outside the boxes
+# node_*: boxes; accent: event outlines; text: labels outside the boxes;
+# done_fill, crit, crit_text: Gantt bars of done and critical tasks
 PALETTES = {
     "purple": {
         "node_fill": "5236AB", "node_line": "3A2680", "node_text": "FFFFFF", "accent": "5236AB",
         "text": "200A58", "edge": "200A58", "cluster_fill": "F2F1F9", "cluster_line": "A8A0D6",
         "cluster_text": "200A58", "label_fill": "FFFFFF",
+        "done_fill": "C9C2EA", "crit": "C0304A", "crit_text": "FFFFFF",
     },
     "slate": {
         "node_fill": "F1F5F9", "node_line": "64748B", "node_text": "0F172A", "accent": "64748B",
         "text": "0F172A", "edge": "475569", "cluster_fill": "F8FAFC", "cluster_line": "94A3B8",
         "cluster_text": "334155", "label_fill": "FFFFFF",
+        "done_fill": "CBD5E1", "crit": "DC2626", "crit_text": "FFFFFF",
     },
     "theme": {  # recolours with the deck it is pasted into
         "node_fill": MSO_THEME_COLOR.BACKGROUND_1, "node_line": MSO_THEME_COLOR.ACCENT_1,
@@ -25,6 +28,8 @@ PALETTES = {
         "text": MSO_THEME_COLOR.TEXT_1, "edge": MSO_THEME_COLOR.TEXT_1,
         "cluster_fill": MSO_THEME_COLOR.BACKGROUND_2, "cluster_line": MSO_THEME_COLOR.TEXT_2,
         "cluster_text": MSO_THEME_COLOR.TEXT_2, "label_fill": MSO_THEME_COLOR.BACKGROUND_1,
+        "done_fill": MSO_THEME_COLOR.BACKGROUND_2, "crit": MSO_THEME_COLOR.ACCENT_2,
+        "crit_text": MSO_THEME_COLOR.BACKGROUND_1,
     },
 }
 AUTHOR_ENV = "MERMAID2PPTX_AUTHOR"      # default document author, when --author is not given

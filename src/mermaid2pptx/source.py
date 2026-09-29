@@ -6,7 +6,7 @@ import re
 from .errors import MermaidError
 
 # first word of a diagram -> its type
-KINDS = {"flowchart": "flowchart", "graph": "flowchart", "sequencediagram": "sequence"}
+KINDS = {"flowchart": "flowchart", "graph": "flowchart", "sequencediagram": "sequence", "gantt": "gantt"}
 
 
 def extract_blocks(src: str) -> list[str]:

@@ -25,6 +25,10 @@ All notable changes to this project are recorded here. The format follows
   `-)`, `<<->>`…), messages to oneself, activation bars (`+`/`-`, `activate`), notes,
   `loop`/`alt`/`opt`/`par`/`critical`/`break` blocks, `rect` backgrounds, `box` groups,
   `autonumber` and `title`. Example: `examples/sequence.mmd`.
+- **Gantt charts** (`gantt`): sections as bands, a time axis with automatic ticks (or
+  `tickInterval`), `dateFormat` and `axisFormat`, tasks by date, duration, `after` and `until`,
+  `done`/`active`/`crit` bars and milestones, `excludes weekends` (and days, dates) with the
+  excluded days shaded. Example: `examples/gantt.mmd`.
 
 - A browser version, published on GitHub Pages: https://jeanmicheldurand.github.io/mermaid2pptx/. It runs the converter
   in the page with Pyodide, for users who cannot install or run programs.
