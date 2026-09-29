@@ -58,10 +58,15 @@ jobs:
         with:
           path: dist
           merge-multiple: true
-      - name: create the release
+      - name: create the release, or add the executables to one made by hand
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+          fi
 
   # Trusted publishing, no token: on pypi.org, add a "pending publisher" for project mermaid2pptx
   # with this repository, workflow release.yml and environment pypi (once, before the first tag).
