@@ -1,0 +1,15 @@
+name: Feature request
+description: Mermaid syntax that is not covered yet, or a new option
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you want to draw
+      description: A Mermaid example of the syntax, and how it should look in PowerPoint.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters to you

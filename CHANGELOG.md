@@ -6,6 +6,14 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-29
+
+### Fixed
+
+- A missing or unreadable input file, an input not saved as UTF-8, or an output that cannot be
+  written (for instance still open in PowerPoint) now prints a one-line `error:` message and exits
+  with status 1, instead of a Python traceback.
+
 ## [1.0.0] - 2026-09-29
 
 ### Added
@@ -22,5 +30,6 @@ All notable changes to this project are recorded here. The format follows
 - Document author from `--author` or `MERMAID2PPTX_AUTHOR`.
 - Standalone executables for Windows, Linux and macOS, and a PyPI package.
 
-[Unreleased]: ../../compare/v1.0.0...HEAD
+[Unreleased]: ../../compare/v1.0.1...HEAD
+[1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0

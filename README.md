@@ -1,5 +1,10 @@
 # mermaid2pptx
 
+[![tests](https://github.com/JeanMichelDurand/mermaid2pptx/actions/workflows/ci.yml/badge.svg)](https://github.com/JeanMichelDurand/mermaid2pptx/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/mermaid2pptx)](https://pypi.org/project/mermaid2pptx/)
+[![Python](https://img.shields.io/pypi/pyversions/mermaid2pptx)](https://pypi.org/project/mermaid2pptx/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/LICENSE)
+
 Turns a Mermaid **flowchart** into native PowerPoint shapes on a single slide, ready to copy
 into an existing deck: real autoshapes and connectors glued to them, not a picture. By default
 the flowchart is read as a simplified **BPMN** process and drawn like one.
@@ -199,6 +204,11 @@ drawn, lands on the connection site it is glued to.
 The connection-site indices in `SHAPES` were measured in PowerPoint through COM
 (`ConnectionSiteCount` / `BeginConnect`), and the examples were checked by rendering them in
 PowerPoint and moving a node to confirm the glue holds.
+
+## Contributing
+
+Bug reports (with the Mermaid input) and pull requests are welcome: see
+[CONTRIBUTING.md](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CONTRIBUTING.md) and the [Code of Conduct](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CODE_OF_CONDUCT.md).
 
 ## Releasing
 

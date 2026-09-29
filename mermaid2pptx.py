@@ -39,7 +39,7 @@ from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Pt
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 EMU_PER_PT = 12700
 
@@ -1725,11 +1725,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     args = ap.parse_args(argv)
 
-    if args.input == "-":
-        sys.stdin.reconfigure(encoding="utf-8-sig")      # the Windows console code page is not UTF-8
-        src = sys.stdin.read()
-    else:
-        src = Path(args.input).read_text(encoding="utf-8-sig")   # tolerate Notepad's BOM
+    try:
+        if args.input == "-":
+            sys.stdin.reconfigure(encoding="utf-8-sig")      # the Windows console code page is not UTF-8
+            src = sys.stdin.read()
+        else:
+            src = Path(args.input).read_text(encoding="utf-8-sig")   # tolerate Notepad's BOM
+    except OSError as exc:
+        print(f"error: cannot read {args.input}: {exc.strerror}", file=sys.stderr)
+        return 1
+    except UnicodeDecodeError:
+        print(f"error: {args.input} is not UTF-8: save it as UTF-8 and try again", file=sys.stderr)
+        return 1
     blocks = extract_blocks(src)
     if not 1 <= args.block <= len(blocks):
         ap.error(f"--block {args.block}: the input has {len(blocks)} mermaid block(s)")
@@ -1747,7 +1754,12 @@ def main(argv: list[str] | None = None) -> int:
     except MermaidError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
-    prs.save(out)
+    try:
+        prs.save(out)
+    except OSError as exc:
+        hint = " (is it open in PowerPoint?)" if isinstance(exc, PermissionError) else ""
+        print(f"error: cannot write {out}: {exc.strerror}{hint}", file=sys.stderr)
+        return 1
     for w in d.warnings:
         print(f"warning: {w}", file=sys.stderr)
     print(f"{out}: {len(d.nodes)} nodes, {len(d.edges)} edges, {len(d.subgraphs)} subgraphs")

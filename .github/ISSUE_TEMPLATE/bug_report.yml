@@ -1,0 +1,43 @@
+name: Bug report
+description: A diagram that fails to convert, or converts wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: input
+    attributes:
+      label: Mermaid input
+      description: The smallest diagram that shows the problem. Without it, the bug cannot be reproduced.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens, and what you expected
+      description: The error message, or what looks wrong on the slide. A screenshot of the slide helps.
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command line
+      placeholder: mermaid2pptx diagram.mmd --direction LR
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `mermaid2pptx --version`
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you run it
+      options: [Downloaded executable, pipx / uv tool / pip, install.py from a copy of the repo]
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: System and PowerPoint version
+      placeholder: Windows 11, PowerPoint 365

@@ -2,9 +2,16 @@ name: tests
 
 on:
   push:
+    branches: [main]            # a pull request's branch is tested by the pull_request event
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/ruff-action@v3      # settings in pyproject.toml [tool.ruff]
+
   test:
     strategy:
       fail-fast: false
@@ -25,3 +32,11 @@ jobs:
           python -m pip install .
           mermaid2pptx --version
           mermaid2pptx examples/flowchart.mmd -o flowchart.pptx
+
+  # The one check branch protection requires: green only when every job above is.
+  ci-ok:
+    if: always()
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = false

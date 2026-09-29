@@ -37,3 +37,10 @@ py-modules = ["mermaid2pptx"]
 
 [tool.setuptools.dynamic]
 version = { attr = "mermaid2pptx.__version__" }
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]      # real errors (pyflakes) and layout (pycodestyle), no style preferences

@@ -388,6 +388,26 @@ def test_cli(tmp_path, capsys):
     assert m2p.__version__ in capsys.readouterr().out
 
 
+def test_cli_file_errors(tmp_path, capsys, monkeypatch):
+    """A one-line message, never a traceback: the .exe is run by people who don't read Python."""
+    assert m2p.main([str(tmp_path / "missing.mmd")]) == 1
+    assert capsys.readouterr().err.startswith("error: cannot read")
+    ansi = tmp_path / "ansi.mmd"
+    ansi.write_bytes("graph TD\nA[Été] --> B\n".encode("cp1252"))
+    assert m2p.main([str(ansi)]) == 1
+    assert "is not UTF-8" in capsys.readouterr().err
+    good = tmp_path / "good.mmd"
+    good.write_text("graph TD\nA --> B\n", encoding="utf-8")
+    assert m2p.main([str(good), "-o", str(tmp_path / "no" / "such" / "dir.pptx")]) == 1
+    assert capsys.readouterr().err.startswith("error: cannot write")
+
+    def locked(self, path):
+        raise PermissionError(13, "Permission denied")
+    monkeypatch.setattr(type(m2p.Presentation()), "save", locked)
+    assert m2p.main([str(good)]) == 1
+    assert "open in PowerPoint" in capsys.readouterr().err
+
+
 LANES_SRC = """graph TD
     subgraph U["👤 Client"]
         S(( )) --> A["👤 Demande"]

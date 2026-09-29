@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question
+    url: https://github.com/JeanMichelDurand/mermaid2pptx/discussions
+    about: How do I…? Ask in Discussions rather than opening an issue.
