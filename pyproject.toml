@@ -30,10 +30,10 @@ Changelog = "https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CHANGELO
 dev = ["pytest>=8", "pyinstaller>=6"]
 
 [project.scripts]
-mermaid2pptx = "mermaid2pptx:main"
+mermaid2pptx = "mermaid2pptx.cli:main"
 
-[tool.setuptools]
-py-modules = ["mermaid2pptx"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.dynamic]
 version = { attr = "mermaid2pptx.__version__" }

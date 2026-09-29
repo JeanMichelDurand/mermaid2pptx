@@ -8,4 +8,4 @@
 - [ ] `ruff check .` passes
 - [ ] A new layout case has an example in `examples/` (the tests check every example in every direction)
 - [ ] `CHANGELOG.md` has a line under `[Unreleased]` if users will notice the change
-- [ ] Still one file, `mermaid2pptx.py`, with `python-pptx` as the only dependency
+- [ ] `python-pptx` is still the only dependency, and no file is over 500 lines

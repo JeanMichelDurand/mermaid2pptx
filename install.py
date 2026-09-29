@@ -1,8 +1,8 @@
-"""Creates .venv next to this file, installs the dependencies and writes the launcher:
+"""Creates .venv next to this file, installs the converter in it and writes the launcher:
 mermaid2pptx.bat on Windows, mermaid2pptx (a shell script) on Linux and macOS.
 
     py install.py            runtime only             (python3 install.py on Linux/macOS)
-    py install.py dev        runtime + pytest
+    py install.py dev        runtime + pytest, pyinstaller
 
 A Python script rather than a batch file, so the folder can be mailed: mail filters
 block .bat files, even inside a zip.
@@ -16,12 +16,12 @@ HERE = Path(__file__).resolve().parent
 WINDOWS = sys.platform == "win32"
 BAT = r"""@echo off
 rem Runs the converter with the .venv made by install.py. Arguments are passed through.
-"%~dp0.venv\Scripts\python.exe" "%~dp0mermaid2pptx.py" %*
+"%~dp0.venv\Scripts\python.exe" -m mermaid2pptx %*
 """
 SH = """#!/bin/sh
 # Runs the converter with the .venv made by install.py. Arguments are passed through.
 here=$(cd "$(dirname "$0")" && pwd)
-exec "$here/.venv/bin/python" "$here/mermaid2pptx.py" "$@"
+exec "$here/.venv/bin/python" -m mermaid2pptx "$@"
 """
 
 
@@ -34,8 +34,8 @@ def main(argv: list[str]) -> int:
     py = env / ("Scripts/python.exe" if WINDOWS else "bin/python")
     if not py.exists():
         venv.create(env, with_pip=True)
-    req = HERE / ("requirements-dev.txt" if argv[1:2] == ["dev"] else "requirements.txt")
-    pip = [str(py), "-m", "pip", "install", "--disable-pip-version-check", "-q", "-r", str(req)]
+    target = [str(HERE) + ("[dev]" if argv[1:2] == ["dev"] else "")]       # this folder, as a package
+    pip = [str(py), "-m", "pip", "install", "--disable-pip-version-check", "-q", *target]
     if subprocess.run(pip).returncode:
         return 1
     if WINDOWS:

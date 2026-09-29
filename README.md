@@ -9,7 +9,7 @@ Turns a Mermaid **flowchart** into native PowerPoint shapes on a single slide, r
 into an existing deck: real autoshapes and connectors glued to them, not a picture. By default
 the flowchart is read as a simplified **BPMN** process and drawn like one.
 
-One Python file, one dependency (`python-pptx`). Runs on Windows, Linux and macOS.
+One dependency (`python-pptx`). Runs on Windows, Linux and macOS, or in the browser.
 PowerPoint is only needed to open the result.
 
 ## Before / after
@@ -224,7 +224,7 @@ Bug reports (with the Mermaid input) and pull requests are welcome: see
 
 ## Releasing
 
-Bump `__version__` in `mermaid2pptx.py`, commit, then `git tag v1.2.3 && git push --tags`.
+Bump `__version__` in `src/mermaid2pptx/__init__.py`, commit, then `git tag v1.2.3 && git push --tags`.
 The `release` workflow runs the tests, builds one standalone executable per system with
 PyInstaller, runs each on an example, attaches them to a GitHub release, and publishes the
 package to PyPI. Record the changes in [CHANGELOG.md](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CHANGELOG.md) first.

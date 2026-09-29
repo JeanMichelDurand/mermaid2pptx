@@ -158,7 +158,7 @@ $("src").addEventListener("drop", (e) => {
   if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
 
-// ---- Python: the converter itself, mermaid2pptx.py, run by Pyodide ---------------------------
+// ---- Python: the converter itself, the mermaid2pptx wheel, run by Pyodide ---------------------
 const GLUE = `
 import io, json
 import mermaid2pptx as m
@@ -171,14 +171,14 @@ def run(src, opts):
         raise m.MermaidError(f"Markdown block {block}: the input has {len(blocks)} mermaid block(s)")
     prs, d, _ = m.convert(blocks[block - 1], m.Options(**o))
     prs.save("/tmp/out.pptx")
-    summary = f"{len(d.nodes)} nodes, {len(d.edges)} edges, {len(d.subgraphs)} subgraphs"
-    return json.dumps({"summary": summary, "warnings": d.warnings})
+    return json.dumps({"summary": d.summary(), "warnings": d.warnings})
 `;
 const pyReady = (async () => {
   const py = await loadPyodide();
   await py.loadPackage(["micropip", "lxml", "pillow"]);
-  await py.pyimport("micropip").install("python-pptx>=1.0.2,<2");
-  py.FS.writeFile("mermaid2pptx.py", await (await fetch("mermaid2pptx.py")).text());
+  // wheel.txt names the wheel the pages workflow built next to this page; python-pptx comes from PyPI
+  const wheel = (await (await fetch("wheel.txt")).text()).trim();
+  await py.pyimport("micropip").install(new URL(wheel, location.href).href);
   py.runPython(GLUE);
   return py;
 })();
