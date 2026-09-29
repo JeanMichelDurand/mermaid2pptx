@@ -408,6 +408,19 @@ def test_cli_file_errors(tmp_path, capsys, monkeypatch):
     assert "open in PowerPoint" in capsys.readouterr().err
 
 
+def test_convert_files_reports_for_a_message_box(tmp_path, capsys, monkeypatch):
+    good, bad = tmp_path / "good.mmd", tmp_path / "bad.mmd"
+    good.write_text("graph TD\nA --> B\n", encoding="utf-8")
+    bad.write_text("pie\n", encoding="utf-8")
+    assert m2p.convert_files([str(good)]) == (True, f"{tmp_path / 'good.pptx'}: 4 nodes, 3 edges, 0 subgraphs")
+    ok, report = m2p.convert_files([str(good), str(bad), str(tmp_path / "missing.mmd")])
+    assert not ok and report.count("\n") == 2 and "error: cannot read" in report
+    monkeypatch.setattr(m2p, "convert", lambda *a: 1 / 0)                  # a bug, not a user error
+    ok, report = m2p.convert_files([str(good)])
+    assert not ok and "unexpected ZeroDivisionError" in report
+    assert capsys.readouterr() == ("", "")                                  # nothing leaks to the console
+
+
 LANES_SRC = """graph TD
     subgraph U["👤 Client"]
         S(( )) --> A["👤 Demande"]

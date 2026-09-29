@@ -1766,24 +1766,64 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _hold_window():
-    """Keep the console open when the Windows executable was started from Explorer.
+def convert_files(paths: list[str]) -> tuple[bool, str]:
+    """Convert each file with the default options, as `mermaid2pptx FILE` would.
 
-    A double-click, or a file dropped on the .exe, opens a console that closes as soon as the
-    program ends, taking the message with it. From Explorer, the only processes attached to that
-    console are the executable's own two (a one-file build runs under its bootloader); from a
-    shell, the shell is attached as well.
+    Returns whether every file converted, and everything the conversions printed (results,
+    warnings, errors), for a message box.
+    """
+    import contextlib
+    import io
+    ok, report = True, io.StringIO()
+    for path in paths:
+        with contextlib.redirect_stdout(report), contextlib.redirect_stderr(report):
+            try:
+                code = main([path])
+            except SystemExit as exc:                    # argparse errors
+                code = exc.code
+            except Exception as exc:                     # a bug: say so rather than vanish
+                print(f"error: {path}: unexpected {exc!r}. Please report it with the file.")
+                code = 1
+        ok = ok and code == 0
+    return ok, report.getvalue().strip()
+
+
+def _started_from_explorer() -> bool:
+    """The Windows executable was double-clicked, or had files dropped on it.
+
+    From Explorer, the only processes attached to the console are the executable's own two (a
+    one-file build runs under its bootloader); from a shell, the shell is attached as well.
     """
     if sys.platform != "win32" or not getattr(sys, "frozen", False):
-        return
+        return False
     import ctypes
     attached = ctypes.windll.kernel32.GetConsoleProcessList((ctypes.c_uint * 4)(), 4)
-    if 0 < attached <= 2 and sys.stdin and sys.stdin.isatty():     # not in CI, not piped
-        input("\nPress Enter to close this window.")
+    return 0 < attached <= 2 and sys.stdin is not None and sys.stdin.isatty()   # not in CI, not piped
+
+
+def _explorer_ui(paths: list[str]) -> int:
+    """No console for Explorer users: a file dialog when double-clicked, message boxes for results."""
+    import ctypes
+    from tkinter import Tk, filedialog, messagebox
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)     # SW_HIDE
+    root = Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    if not paths:
+        paths = list(filedialog.askopenfilenames(
+            parent=root, title="mermaid2pptx: choose the Mermaid files to convert",
+            filetypes=[("Mermaid or Markdown", "*.mmd *.mermaid *.md *.txt"), ("All files", "*.*")]))
+        if not paths:
+            return 0
+    ok, report = convert_files(paths)
+    if not ok:
+        messagebox.showerror("mermaid2pptx", report, parent=root)
+        return 1
+    if messagebox.askyesno("mermaid2pptx", f"{report}\n\nOpen in PowerPoint now?", parent=root):
+        for path in paths:
+            os.startfile(Path(path).with_suffix(".pptx"))
+    return 0
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    finally:
-        _hold_window()
+    sys.exit(_explorer_ui(sys.argv[1:]) if _started_from_explorer() else main())

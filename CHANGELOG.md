@@ -8,6 +8,13 @@ All notable changes to this project are recorded here. The format follows
 
 ## [1.0.1] - 2026-09-29
 
+### Changed
+
+- The Windows executable, double-clicked, opens a file dialog instead of printing the command-line
+  usage; with files dropped on it, it converts them. Either way, the result or the error shows in
+  a message box that offers to open the slides, and no console window stays behind. From a
+  command prompt it behaves as before.
+
 ### Fixed
 
 - A missing or unreadable input file, an input not saved as UTF-8, or an output that cannot be

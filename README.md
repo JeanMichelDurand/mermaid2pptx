@@ -45,9 +45,10 @@ Take the file for your system from the [latest release](https://github.com/JeanM
 
 Nothing to install: put it in any folder you can write to.
 
-- **Windows.** Drag a `.mmd` file onto `mermaid2pptx-windows-x86_64.exe`: the `.pptx` is written
-  next to it, and the window stays open until you press Enter. The first run may show
-  "Windows protected your PC", because the file is not signed: *More info* → *Run anyway*.
+- **Windows.** Double-click `mermaid2pptx-windows-x86_64.exe` and choose one or more `.mmd` files,
+  or drag the files onto it. Each `.pptx` is written next to its `.mmd`, and a message offers to
+  open them in PowerPoint. The first run may show "Windows protected your PC", because the file
+  is not signed: *More info* → *Run anyway*. From a command prompt, it is the command line below.
 - **Linux / macOS.** `chmod +x mermaid2pptx-*` once. On macOS, the first run is blocked as
   "unidentified developer": `xattr -d com.apple.quarantine mermaid2pptx-macos-arm64`.
 
