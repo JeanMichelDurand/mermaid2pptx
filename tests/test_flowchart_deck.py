@@ -83,13 +83,13 @@ def _fills(prs):
 
 def test_colors():
     src = "graph TD\nA-->B\nstyle B fill:#FFEE00"
-    prs, _, _ = m2p.convert(src, m2p.Options(render="mermaid"))
+    prs, _, _ = m2p.convert(src)
     assert _fills(prs) == {"node A": "5236AB", "node B": "FFEE00"}     # purple by default
     (grp,) = prs.slides[0].shapes
     text = {s.name: str(s.text_frame.paragraphs[0].runs[0].font.color.rgb) for s in grp.shapes
             if s.name.startswith("node ")}
     assert text == {"node A": "FFFFFF", "node B": "0F172A"}             # readable on either fill
-    prs, _, _ = m2p.convert(src, m2p.Options(render="mermaid", color="#00A0B0"))
+    prs, _, _ = m2p.convert(src, m2p.Options(color="#00A0B0"))
     assert _fills(prs)["node A"] == "00A0B0"
     with pytest.raises(ValueError, match="unknown colour"):
         m2p.palette("chartreuse-ish")
@@ -115,7 +115,7 @@ def test_bpmn_reading():
 
 
 def test_bpmn_gateway_text_beside_the_symbol():
-    prs, d, lay = m2p.convert("graph TD\nA --> G{Escalade nécessaire ?}\nG --> B")
+    prs, d, lay = m2p.convert("graph TD\nA --> G{Escalade nécessaire ?}\nG --> B", m2p.Options(render="bpmn"))
     (grp,) = prs.slides[0].shapes
     shapes = {s.name: s for s in grp.shapes}
     diamond, text = shapes["node G"], shapes["text G"]
@@ -125,7 +125,7 @@ def test_bpmn_gateway_text_beside_the_symbol():
 
 
 def test_lanes_rendered_with_icons(tmp_path):
-    prs, d, _ = m2p.convert(LANES_SRC)
+    prs, d, _ = m2p.convert(LANES_SRC, m2p.Options(render="bpmn"))
     assert d.nodes["A"].text == "Demande" and d.nodes["A"].icon == "user"
     assert d.subgraphs["U"].title == "Client" and d.subgraphs["U"].icon == "user"
     (grp,) = prs.slides[0].shapes
@@ -142,7 +142,7 @@ def test_lanes_rendered_with_icons(tmp_path):
 def test_stroke_styles():
     src = ("graph TD\nA((a)):::s --> B:::e\nclassDef s stroke-dasharray: 0,stroke-width:2px\n"
            "classDef e stroke-dasharray: 5 5,stroke-width:3px")
-    prs, _, _ = m2p.convert(src, m2p.Options(render="mermaid"))
+    prs, _, _ = m2p.convert(src)
     (grp,) = prs.slides[0].shapes
     nodes = {s.name: s for s in grp.shapes}
     assert nodes["node A"].line.dash_style is None and nodes["node A"].line.width == Pt(1.5)

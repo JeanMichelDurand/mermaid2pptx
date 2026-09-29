@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Regenerates the README's before/after images (docs/img/) from examples/.
-#   docs/screenshots.sh [EXAMPLE ...]        default: incident_lanes flowchart
+#   docs/screenshots.sh [EXAMPLE ...]        default: every example the README shows
 # Runs under WSL with a Windows host: "before" is the Mermaid diagram rendered by headless Edge
 # (mermaid.js from jsDelivr), "after" is the converted slide exported to PNG by PowerPoint (COM).
-# Both are cropped to their content by Pillow. Needs ./install.py already run, and Pillow.
+# Both are cropped to their content by Pillow. Needs `python3 install.py dev` already run, and Pillow.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 PY=${PY:-python3}
 EDGE="/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
-NAMES=("$@"); [ ${#NAMES[@]} -gt 0 ] || NAMES=(incident_lanes flowchart)
+NAMES=("$@"); [ ${#NAMES[@]} -gt 0 ] || NAMES=(incident_lanes flowchart sequence gantt)
+declare -A OPTS=([incident_lanes]="--render bpmn")      # converter options, per example
 OUT="$ROOT/docs/img"; mkdir -p "$OUT"
 
 # PowerPoint and Edge cannot reliably use \\wsl.localhost paths: stage under the Windows %TEMP%.
@@ -33,7 +34,8 @@ EOF
     --window-size=1400,2400 --virtual-time-budget=15000 \
     --screenshot="$WIN_STAGE\\$name.before.png" "file:///$(wslpath -m "$STAGE/$name.html")" 2>/dev/null
   # after: the converted slide, exported by PowerPoint
-  "$ROOT/mermaid2pptx" "$src" -o "$STAGE/$name.pptx" >/dev/null
+  # shellcheck disable=SC2086
+  "$ROOT/.venv/bin/python" -m mermaid2pptx ${OPTS[$name]:-} "$src" -o "$STAGE/$name.pptx" >/dev/null
   powershell.exe -NoProfile -NonInteractive -Command "
     \$ErrorActionPreference = 'Stop'
     \$app = New-Object -ComObject PowerPoint.Application

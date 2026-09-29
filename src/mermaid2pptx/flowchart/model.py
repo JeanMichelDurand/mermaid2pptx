@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from ..text import count
+
 
 @dataclass
 class Node:
@@ -55,7 +57,8 @@ class Diagram:
         return tuple(reversed(out))
 
     def summary(self) -> str:
-        return f"{len(self.nodes)} nodes, {len(self.edges)} edges, {len(self.subgraphs)} subgraphs"
+        return ", ".join(count(len(x), noun) for x, noun in ((self.nodes, "node"), (self.edges, "edge"),
+                                                              (self.subgraphs, "subgraph")))
 
     def node_style(self, node: Node) -> dict[str, str]:
         style = dict(self.class_defs.get("default", {}))

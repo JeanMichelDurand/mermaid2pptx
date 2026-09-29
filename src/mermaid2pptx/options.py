@@ -50,7 +50,7 @@ class Options:
     font_size: float = 12.0
     font: str | None = None
     color: str = "purple"               # a PALETTES name or #RRGGBB
-    render: str = "bpmn"                # bpmn | mermaid
+    render: str = "mermaid"             # mermaid | bpmn
     events: bool = True                 # bpmn: add missing start/end events
     lanes: bool = True                  # bpmn: top-level subgraphs as swim lanes
     author: str | None = None           # None: $MERMAID2PPTX_AUTHOR, else empty

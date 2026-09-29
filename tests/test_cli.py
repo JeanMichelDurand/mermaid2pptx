@@ -27,9 +27,9 @@ def test_cli(tmp_path, capsys):
     md.write_text("```mermaid\ngraph TD\nA-->B\n```\n```mermaid\ngraph LR\nX-->Y-->Z\n```\n")
     assert cli.main([str(md), "--block", "2"]) == 0
     assert (tmp_path / "doc.pptx").exists()
+    assert "3 nodes, 2 edges" in capsys.readouterr().out            # the Mermaid drawing by default
+    assert cli.main([str(md), "--block", "2", "--render", "bpmn", "--color", "slate"]) == 0
     assert "5 nodes, 4 edges" in capsys.readouterr().out            # + start and end events
-    assert cli.main([str(md), "--block", "2", "--render", "mermaid", "--color", "slate"]) == 0
-    assert "3 nodes, 2 edges" in capsys.readouterr().out
     with pytest.raises(SystemExit):
         cli.main([str(md), "--color", "nope"])
     bad = tmp_path / "bad.mmd"
@@ -66,7 +66,7 @@ def test_convert_files_reports_for_a_message_box(tmp_path, capsys, monkeypatch):
     good, bad = tmp_path / "good.mmd", tmp_path / "bad.mmd"
     good.write_text("graph TD\nA --> B\n", encoding="utf-8")
     bad.write_text("pie\n", encoding="utf-8")
-    assert cli.convert_files([str(good)]) == (True, f"{tmp_path / 'good.pptx'}: 4 nodes, 3 edges, 0 subgraphs")
+    assert cli.convert_files([str(good)]) == (True, f"{tmp_path / 'good.pptx'}: 2 nodes, 1 edge, 0 subgraphs")
     ok, report = cli.convert_files([str(good), str(bad), str(tmp_path / "missing.mmd")])
     assert not ok and report.count("\n") == 2 and "error: cannot read" in report
     monkeypatch.setattr(cli, "convert", lambda *a: 1 / 0)                  # a bug, not a user error

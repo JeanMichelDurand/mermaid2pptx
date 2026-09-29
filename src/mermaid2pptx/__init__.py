@@ -1,4 +1,5 @@
-"""Convert a Mermaid flowchart into native, editable PowerPoint shapes on one blank slide.
+"""Convert a Mermaid flowchart, sequence diagram or Gantt chart into native, editable PowerPoint
+shapes on one blank slide.
 
     mermaid2pptx diagram.mmd -o diagram.pptx
     mermaid2pptx notes.md --block 2                    # 2nd ```mermaid block
@@ -8,14 +9,11 @@ The deck is python-pptx's built-in blank presentation, not a corporate template:
 click the diagram (a single group) and paste it into any slide. Nodes are autoshapes;
 edges are connectors glued to the nodes' connection sites, so they follow a node you move.
 
-Only `flowchart` / `graph` diagrams are supported. The layout is a small layered
-(Sugiyama-style) engine written here, with orthogonal routing: every edge is a straight
-line or an elbow connector whose segments are horizontal/vertical, with horizontal jogs
-spread on separate tracks between two layers so they never sit on top of each other.
-By default (--render bpmn) the flowchart is read as a simplified BPMN process: decisions
-become gateways, circles and stadiums events, other boxes tasks, with missing start/end
-events added, top-level subgraphs drawn as swim lanes and a leading 👤 as a user icon
-(to_bpmn). Boxes are purple unless --color says otherwise.
+Flowcharts are laid out by a small layered (Sugiyama-style) engine with orthogonal routing
+(flowchart/layout). With --render bpmn a flowchart is read as a simplified BPMN process:
+decisions become gateways, circles and stadiums events, other boxes tasks, with missing
+start/end events added, top-level subgraphs drawn as swim lanes and a leading 👤 as a user
+icon (flowchart/bpmn.py). Boxes are purple unless --color says otherwise.
 See README.md for the syntax covered and the known limits.
 """
 from .convert import convert

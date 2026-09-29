@@ -22,9 +22,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--direction", choices=sorted(DIRECTIONS), help="override the diagram direction")
     ap.add_argument("--font-size", type=float, default=12.0, help="node text size in pt before fitting (12)")
     ap.add_argument("--font", help="font name (default: the theme font, so a paste adopts the target deck's)")
-    ap.add_argument("--render", choices=("bpmn", "mermaid"), default="bpmn",
-                    help="bpmn (default): tasks, gateways and events like a BPMN process; "
-                         "mermaid: the flowchart's own shapes")
+    ap.add_argument("--render", choices=("mermaid", "bpmn"), default="mermaid",
+                    help="flowcharts: mermaid (default) draws the flowchart's own shapes; "
+                         "bpmn draws tasks, gateways, events and swim lanes like a BPMN process")
     ap.add_argument("--no-events", action="store_true",
                     help="bpmn: don't add the start and end events the diagram lacks")
     ap.add_argument("--no-lanes", action="store_true",

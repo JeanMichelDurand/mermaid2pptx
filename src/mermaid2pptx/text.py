@@ -3,6 +3,11 @@ import html
 import re
 
 
+def count(n: int, noun: str) -> str:
+    """`1 edge`, `2 edges`."""
+    return f"{n} {noun}{'' if n == 1 else 's'}"
+
+
 def clean_text(text: str) -> str:
     """Mermaid label -> plain text with '\\n' line breaks."""
     t = text.strip()

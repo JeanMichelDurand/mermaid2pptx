@@ -5,9 +5,10 @@
 [![Python](https://img.shields.io/pypi/pyversions/mermaid2pptx)](https://pypi.org/project/mermaid2pptx/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/LICENSE)
 
-Turns a Mermaid **flowchart** into native PowerPoint shapes on a single slide, ready to copy
-into an existing deck: real autoshapes and connectors glued to them, not a picture. By default
-the flowchart is read as a simplified **BPMN** process and drawn like one.
+Turns a Mermaid **flowchart**, **sequence diagram** or **Gantt chart** into native PowerPoint
+shapes on a single slide, ready to copy into an existing deck: real autoshapes and connectors
+glued to them, not a picture. A flowchart can also be read as a simplified **BPMN** process and
+drawn like one (`--render bpmn`).
 
 One dependency (`python-pptx`). Runs on Windows, Linux and macOS, or in the browser.
 PowerPoint is only needed to open the result.
@@ -17,7 +18,7 @@ PowerPoint is only needed to open the result.
 A front-office incident process with three swim lanes
 ([`examples/incident_lanes.mmd`](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/examples/incident_lanes.mmd)):
 
-| Mermaid | PowerPoint (`mermaid2pptx incident_lanes.mmd`) |
+| Mermaid | PowerPoint (`mermaid2pptx --render bpmn incident_lanes.mmd`) |
 |---|---|
 | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/incident_lanes.before.png" width="300" alt="Mermaid rendering: three stacked subgraphs"> | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/incident_lanes.after.png" width="560" alt="PowerPoint slide: three BPMN swim lanes with glued connectors"> |
 
@@ -124,7 +125,7 @@ Input files are read as UTF-8 (with or without BOM).
 | `--direction TB\|BT\|LR\|RL` | override the diagram's direction |
 | `--font-size PT` | node text size before fitting (12) |
 | `--font NAME` | fixed font instead of the theme font |
-| `--render bpmn\|mermaid` | `bpmn` (default): drawn like a BPMN process, see below. `mermaid`: the flowchart's own shapes |
+| `--render mermaid\|bpmn` | Flowcharts. `mermaid` (default): the flowchart's own shapes. `bpmn`: drawn like a BPMN process, see below |
 | `--no-events` | `bpmn`: don't add the start and end events the diagram lacks |
 | `--no-lanes` | `bpmn`: draw top-level subgraphs as groups, never as lanes |
 | `--color NAME\|#RRGGBB` | box colours. `purple` (default): `#5236AB` with white text. `slate`: light grey boxes. `theme`: theme colours (background 1, accent 1, text 1), so the paste recolours with the target deck. `#RRGGBB`: boxes in that colour, with black or white text for contrast |
@@ -134,7 +135,7 @@ Input files are read as UTF-8 (with or without BOM).
 | `--no-group` | shapes left ungrouped |
 | `--version` | print the version |
 
-## BPMN render (default)
+## BPMN render (`--render bpmn`)
 
 The input is a plain Mermaid flowchart used as a simplified BPMN process. It is drawn this way:
 

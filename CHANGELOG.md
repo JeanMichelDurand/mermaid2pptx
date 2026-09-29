@@ -6,7 +6,17 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
-## [1.0.2] - 2026-09-29
+## [1.1.0] - 2026-09-29
+
+### Changed
+
+- **Flowcharts are drawn with their own Mermaid shapes by default.** The BPMN reading (gateways,
+  events, swim lanes, added start and end events) is now opt-in: `--render bpmn`. To keep the
+  1.0 output, add `--render bpmn` to your commands.
+- The code is a package (`src/mermaid2pptx/`, one folder per diagram type) instead of one
+  file, with no file over 500 lines; `CONTRIBUTING.md` has the map. `python -m mermaid2pptx`
+  works, and `import mermaid2pptx` keeps `convert`, `Options` and `MermaidError`.
+- The summary line counts in the singular when there is one: `1 edge`.
 
 ### Added
 
