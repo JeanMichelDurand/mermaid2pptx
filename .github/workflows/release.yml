@@ -33,8 +33,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: tag matches the version
@@ -54,7 +54,7 @@ jobs:
           mv "$exe" "dist/${{ matrix.asset }}"
       - id: unsigned
         if: env.SIGN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
@@ -76,7 +76,7 @@ jobs:
           if ($sig.Status -ne 'Valid') { throw "signature: $($sig.Status)" }
           Move-Item -Force "signed/${{ matrix.asset }}" "dist/${{ matrix.asset }}"
           & "dist/${{ matrix.asset }}" --version
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
@@ -85,7 +85,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
@@ -110,8 +110,8 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: build the sdist and wheel
