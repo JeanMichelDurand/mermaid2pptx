@@ -39,7 +39,7 @@ from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Pt
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 EMU_PER_PT = 12700
 

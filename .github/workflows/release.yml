@@ -25,6 +25,10 @@ jobs:
             asset: mermaid2pptx-macos-arm64
             extra: --exclude-module tkinter
     runs-on: ${{ matrix.os }}
+    env:
+      # Windows executable signed by SignPath once the repository secret SIGNPATH_API_TOKEN and the
+      # variable SIGNPATH_ORGANIZATION_ID exist (see CODE_SIGNING.md); unsigned until then.
+      SIGN: ${{ matrix.os == 'windows-latest' && secrets.SIGNPATH_API_TOKEN != '' }}
     defaults:
       run:
         shell: bash
@@ -48,7 +52,31 @@ jobs:
           "$exe" examples/incident_lanes.mmd -o smoke.pptx
           test -s smoke.pptx
           mv "$exe" "dist/${{ matrix.asset }}"
-      - uses: actions/upload-artifact@v7
+      - id: unsigned
+        if: env.SIGN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+      - if: env.SIGN == 'true'
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: mermaid2pptx
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed
+      - name: use the signed executable
+        if: env.SIGN == 'true'
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature "signed/${{ matrix.asset }}"
+          if ($sig.Status -ne 'Valid') { throw "signature: $($sig.Status)" }
+          Move-Item -Force "signed/${{ matrix.asset }}" "dist/${{ matrix.asset }}"
+          & "dist/${{ matrix.asset }}" --version
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
           path: dist/${{ matrix.asset }}

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mermaid2pptx</title>
+<meta name="description" content="Convert a Mermaid flowchart into native, editable PowerPoint shapes, in your browser.">
+<style>
+  :root {
+    --bg: #f8fafc; --panel: #ffffff; --text: #0f172a; --muted: #475569; --line: #cbd5e1;
+    --accent: #5236ab; --accent-text: #ffffff; --error: #b91c1c; --warn: #92400e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a; --panel: #1e293b; --text: #e2e8f0; --muted: #94a3b8; --line: #334155;
+      --accent: #8b74e0; --accent-text: #0f172a; --error: #f87171; --warn: #fbbf24;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  p.lead { margin: 0 0 20px; color: var(--muted); }
+  a { color: var(--accent); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+           min-width: 0; }
+  .panel h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+              margin: 0 0 8px; }
+  textarea { width: 100%; min-height: 360px; resize: vertical; border: 1px solid var(--line); border-radius: 6px;
+             padding: 10px; background: var(--bg); color: var(--text);
+             font: 13px/1.45 ui-monospace, "Cascadia Code", Consolas, monospace; }
+  textarea.drop { outline: 2px dashed var(--accent); }
+  #preview { min-height: 360px; overflow: auto; display: flex; align-items: flex-start; justify-content: center;
+             background: #fff; border-radius: 6px; }
+  #preview svg { max-width: 100%; height: auto; }
+  .options { display: flex; flex-wrap: wrap; gap: 12px 20px; margin: 16px 0; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); }
+  select, input[type=number] { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line);
+                               background: var(--panel); color: var(--text); }
+  input[type=number] { width: 5em; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  button, .file { font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 6px; cursor: pointer;
+                  border: 1px solid var(--accent); }
+  button { background: var(--accent); color: var(--accent-text); }
+  button:disabled { opacity: .5; cursor: wait; }
+  .file { background: transparent; color: var(--accent); }
+  .file input { display: none; }
+  #status { margin-top: 12px; white-space: pre-wrap; min-height: 1.5em; }
+  #status.error { color: var(--error); }
+  #status .warn { color: var(--warn); }
+  footer { margin-top: 32px; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>mermaid2pptx</h1>
+  <p class="lead">Turn a Mermaid flowchart into native, editable PowerPoint shapes. Runs entirely in your
+    browser: nothing to install, and your diagram never leaves your computer.</p>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Mermaid (type, paste, or drop a .mmd / .md file)</h2>
+      <textarea id="src" spellcheck="false" aria-label="Mermaid source"></textarea>
+    </section>
+    <section class="panel">
+      <h2>Preview (Mermaid's own rendering)</h2>
+      <div id="preview" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <div class="options">
+    <label>Drawing
+      <select id="render">
+        <option value="bpmn">BPMN process (default)</option>
+        <option value="mermaid">Mermaid shapes</option>
+      </select>
+    </label>
+    <label>Colours
+      <select id="color">
+        <option value="purple">Purple</option>
+        <option value="slate">Slate (light grey)</option>
+        <option value="theme">Theme (adopts the target deck's colours)</option>
+      </select>
+    </label>
+    <label>Direction
+      <select id="direction">
+        <option value="">As in the diagram</option>
+        <option>TB</option><option>LR</option><option>BT</option><option>RL</option>
+      </select>
+    </label>
+    <label>Slide
+      <select id="aspect"><option>16:9</option><option>4:3</option></select>
+    </label>
+    <label>Markdown block
+      <input id="block" type="number" min="1" value="1">
+    </label>
+  </div>
+
+  <div class="row">
+    <button id="convert" disabled>Loading…</button>
+    <label class="file">Open a file…<input id="file" type="file" accept=".mmd,.mermaid,.md,.txt"></label>
+  </div>
+  <div id="status" role="status"></div>
+
+  <footer>
+    Open the downloaded .pptx, click the diagram (one group), copy it and paste it into your slide.
+    The first conversion loads Python in the page (about 15 MB, cached afterwards).
+    <a href="https://github.com/JeanMichelDurand/mermaid2pptx">Source, command-line version and documentation</a>.
+    MIT licence, provided as is, without warranty.
+  </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const status = (text, cls = "") => { $("status").className = cls; $("status").textContent = text; };
+let fileName = "diagram";
+
+// ---- Mermaid preview -------------------------------------------------------------------------
+mermaid.initialize({ startOnLoad: false, theme: "default" });
+let previewTimer, previewSeq = 0;
+function schedulePreview() {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(async () => {
+    const seq = ++previewSeq;
+    const text = mermaidBlock($("src").value);
+    try {
+      const { svg } = await mermaid.render("m" + seq, text);
+      if (seq === previewSeq) $("preview").innerHTML = svg;
+    } catch (e) {
+      if (seq === previewSeq) $("preview").textContent = "Mermaid cannot draw this yet: " + (e.message || e);
+    }
+  }, 400);
+}
+function mermaidBlock(text) {            // the chosen ```mermaid block of a Markdown file, for the preview
+  const blocks = [...text.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)].map((m) => m[1]);
+  return blocks.length ? (blocks[+$("block").value - 1] || blocks[0]) : text;
+}
+
+// ---- Input: typing, file picker, drag and drop -------------------------------------------------
+async function loadFile(file) {
+  $("src").value = (await file.text()).replace(/^﻿/, "");
+  fileName = file.name.replace(/\.[^.]+$/, "") || "diagram";
+  schedulePreview();
+  status(`Loaded ${file.name}.`);
+}
+$("src").addEventListener("input", schedulePreview);
+$("block").addEventListener("input", schedulePreview);
+$("file").addEventListener("change", (e) => e.target.files[0] && loadFile(e.target.files[0]));
+$("src").addEventListener("dragover", (e) => { e.preventDefault(); $("src").classList.add("drop"); });
+$("src").addEventListener("dragleave", () => $("src").classList.remove("drop"));
+$("src").addEventListener("drop", (e) => {
+  e.preventDefault(); $("src").classList.remove("drop");
+  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+
+// ---- Python: the converter itself, mermaid2pptx.py, run by Pyodide ---------------------------
+const GLUE = `
+import io, json
+import mermaid2pptx as m
+
+def run(src, opts):
+    o = json.loads(opts)
+    blocks = m.extract_blocks(src)
+    block = o.pop("block")
+    if not 1 <= block <= len(blocks):
+        raise m.MermaidError(f"Markdown block {block}: the input has {len(blocks)} mermaid block(s)")
+    prs, d, _ = m.convert(blocks[block - 1], m.Options(**o))
+    prs.save("/tmp/out.pptx")
+    summary = f"{len(d.nodes)} nodes, {len(d.edges)} edges, {len(d.subgraphs)} subgraphs"
+    return json.dumps({"summary": summary, "warnings": d.warnings})
+`;
+const pyReady = (async () => {
+  const py = await loadPyodide();
+  await py.loadPackage(["micropip", "lxml", "pillow"]);
+  await py.pyimport("micropip").install("python-pptx>=1.0.2,<2");
+  py.FS.writeFile("mermaid2pptx.py", await (await fetch("mermaid2pptx.py")).text());
+  py.runPython(GLUE);
+  return py;
+})();
+pyReady.then(() => { $("convert").disabled = false; $("convert").textContent = "Convert to PowerPoint"; })
+       .catch((e) => status("Could not load Python in this browser: " + e, "error"));
+
+async function convert() {
+  $("convert").disabled = true;
+  status("Converting…");
+  try {
+    const py = await pyReady;
+    const opts = { render: $("render").value, color: $("color").value, aspect: $("aspect").value,
+                   direction: $("direction").value || null, block: +$("block").value || 1 };
+    const res = JSON.parse(py.globals.get("run")($("src").value, JSON.stringify(opts)));
+    const data = py.FS.readFile("/tmp/out.pptx");
+    const url = URL.createObjectURL(new Blob([data], {
+      type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: fileName + ".pptx" });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    status(`${fileName}.pptx downloaded: ${res.summary}.`);
+    for (const w of res.warnings) {
+      $("status").append(Object.assign(document.createElement("div"), { className: "warn", textContent: "Warning: " + w }));
+    }
+    document.title = "mermaid2pptx: " + res.summary;              // read by the smoke test
+  } catch (e) {
+    const msg = String(e.message || e).trim().split("\n").pop();   // the Python error line, not the traceback
+    status(msg.replace(/^\w*(Mermaid)?Error: /, "Error: "), "error");
+    document.title = "mermaid2pptx: error";
+  } finally {
+    $("convert").disabled = false;
+  }
+}
+$("convert").addEventListener("click", convert);
+
+// ---- Start with an example; #selftest converts it at once (used by CI and docs/screenshots) ----
+fetch("examples/incident_lanes.mmd").then((r) => r.ok ? r.text() : "")
+  .then((t) => { $("src").value = t || "graph TD\n  A[Start] --> B{Choice?}\n  B -->|Yes| C[Do it]\n  B -->|No| D[Skip]";
+                 fileName = t ? "incident_lanes" : "diagram"; schedulePreview();
+                 if (location.hash === "#selftest")          // report to the serving process's log
+                   convert().then(() => fetch("selftest?" + encodeURIComponent(document.title))); });
+</script>
+</body>
+</html>
