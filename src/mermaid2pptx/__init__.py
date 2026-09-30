@@ -21,5 +21,5 @@ from .errors import MermaidError
 from .options import AUTHOR_ENV, PALETTES, Options, palette
 from .source import extract_blocks
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 __all__ = ["AUTHOR_ENV", "PALETTES", "MermaidError", "Options", "convert", "extract_blocks", "palette", "__version__"]

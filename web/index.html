@@ -57,7 +57,8 @@
 <body>
 <main>
   <h1>mermaid2pptx</h1>
-  <p class="lead">Turn a Mermaid flowchart into native, editable PowerPoint shapes. Runs entirely in your
+  <p class="lead">Turn a Mermaid flowchart, sequence diagram or Gantt chart into native, editable
+    PowerPoint shapes. Runs entirely in your
     browser: nothing to install, and your diagram never leaves your computer.</p>
 
   <div class="grid">
@@ -72,6 +73,14 @@
   </div>
 
   <div class="options">
+    <label>Example
+      <select id="example">
+        <option value="flowchart">Flowchart: leave request</option>
+        <option value="incident_lanes">Flowchart as BPMN: incident, with swim lanes</option>
+        <option value="sequence">Sequence diagram: leave request</option>
+        <option value="gantt">Gantt chart: onboarding</option>
+      </select>
+    </label>
     <label>Drawing
       <select id="render">
         <option value="mermaid">Mermaid shapes (default)</option>
@@ -214,12 +223,22 @@ async function convert() {
 }
 $("convert").addEventListener("click", convert);
 
-// ---- Start with an example; #selftest converts it at once (used by CI and docs/screenshots) ----
-fetch("examples/incident_lanes.mmd").then((r) => r.ok ? r.text() : "")
-  .then((t) => { $("src").value = t || "graph TD\n  A[Start] --> B{Choice?}\n  B -->|Yes| C[Do it]\n  B -->|No| D[Skip]";
-                 fileName = t ? "incident_lanes" : "diagram"; schedulePreview();
-                 if (location.hash === "#selftest")          // report to the serving process's log
-                   convert().then(() => fetch("selftest?" + encodeURIComponent(document.title))); });
+// ---- Examples; #selftest converts one at once (used by CI and docs/screenshots) ----------------
+async function loadExample(name) {
+  const r = await fetch(`examples/${name}.mmd`);
+  $("src").value = r.ok ? await r.text() : "graph TD\n  A[Start] --> B{Choice?}\n  B -->|Yes| C[Do it]\n  B -->|No| D[Skip]";
+  fileName = r.ok ? name : "diagram";
+  $("render").value = name === "incident_lanes" ? "bpmn" : "mermaid";     // the BPMN example needs its drawing
+  schedulePreview();
+}
+$("example").addEventListener("change", () => loadExample($("example").value));
+const hash = new URLSearchParams(location.hash.slice(1));        // #selftest, or #selftest=gantt
+const selftest = hash.has("selftest");
+if (hash.get("selftest")) $("example").value = hash.get("selftest");
+loadExample($("example").value).then(() => {
+  if (selftest)                                               // report to the serving process's log
+    convert().then(() => fetch("selftest?" + encodeURIComponent(document.title)));
+});
 </script>
 </body>
 </html>

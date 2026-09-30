@@ -66,7 +66,7 @@ All notable changes to this project are recorded here. The format follows
 - Document author from `--author` or `MERMAID2PPTX_AUTHOR`.
 - Standalone executables for Windows, Linux and macOS, and a PyPI package.
 
-[Unreleased]: ../../compare/v1.0.2...HEAD
-[1.0.2]: ../../compare/v1.0.1...v1.0.2
+[Unreleased]: ../../compare/v1.1.0...HEAD
+[1.1.0]: ../../compare/v1.0.1...v1.1.0
 [1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0

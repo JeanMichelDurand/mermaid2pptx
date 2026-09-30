@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mermaid2pptx"
 dynamic = ["version"]
-description = "Convert Mermaid flowcharts into native, editable PowerPoint shapes (BPMN-style by default)"
+description = "Convert Mermaid flowcharts, sequence diagrams and Gantt charts into native, editable PowerPoint shapes"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = ["python-pptx>=1.0.2,<2"]
-keywords = ["mermaid", "powerpoint", "pptx", "flowchart", "bpmn", "diagram"]
+keywords = ["mermaid", "powerpoint", "pptx", "flowchart", "sequence diagram", "gantt", "bpmn", "diagram"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",

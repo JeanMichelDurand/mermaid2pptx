@@ -27,10 +27,24 @@ A leave request, with a database, a data object and a loop back
 
 | Mermaid | PowerPoint (`mermaid2pptx flowchart.mmd`) |
 |---|---|
-| <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/flowchart.before.png" width="380" alt="Mermaid rendering of the leave request flowchart"> | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/flowchart.after.png" width="440" alt="PowerPoint slide: gateway, events and elbow connectors"> |
+| <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/flowchart.before.png" width="380" alt="Mermaid rendering of the leave request flowchart"> | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/flowchart.after.png" width="440" alt="PowerPoint slide: the same shapes, with elbow connectors"> |
 
-Every box, diamond and arrow on the right is a native, editable PowerPoint object: move a box and
-its connectors follow. `docs/screenshots.sh` regenerates these images.
+The same leave request as a sequence diagram
+([`examples/sequence.mmd`](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/examples/sequence.mmd)):
+
+| Mermaid | PowerPoint (`mermaid2pptx sequence.mmd`) |
+|---|---|
+| <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/sequence.before.png" width="380" alt="Mermaid rendering of the sequence diagram"> | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/sequence.after.png" width="440" alt="PowerPoint slide: participants, lifelines, messages, activation bars, notes and blocks"> |
+
+A new employee's onboarding plan
+([`examples/gantt.mmd`](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/examples/gantt.mmd)):
+
+| Mermaid | PowerPoint (`mermaid2pptx gantt.mmd`) |
+|---|---|
+| <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/gantt.before.png" width="380" alt="Mermaid rendering of the Gantt chart"> | <img src="https://raw.githubusercontent.com/JeanMichelDurand/mermaid2pptx/main/docs/img/gantt.after.png" width="440" alt="PowerPoint slide: sections, bars, milestones and a weekly axis"> |
+
+Every box, diamond and arrow on the right is a native, editable PowerPoint object: move a flowchart
+box and its connectors follow. `docs/screenshots.sh` regenerates these images.
 
 ## Install
 
@@ -78,7 +92,7 @@ This puts a `mermaid2pptx` command on your PATH.
 python3 install.py          # Windows: py install.py
 ```
 
-This creates `.venv/` in this folder, installs `python-pptx` into it and writes a launcher:
+This creates `.venv/` in this folder, installs the converter into it and writes a launcher:
 `mermaid2pptx.bat` on Windows, `mermaid2pptx` (a shell script) on Linux and macOS. Nothing is
 installed globally. The folder holds no `.bat` file until then, so it can be sent by mail: mail
 filters block batch files, even inside a zip.
@@ -122,8 +136,8 @@ Input files are read as UTF-8 (with or without BOM).
 |---|---|
 | `-o FILE` | output path (default: the input name with `.pptx`) |
 | `--block N` | the Nth ```` ```mermaid ```` block of a Markdown file |
-| `--direction TB\|BT\|LR\|RL` | override the diagram's direction |
-| `--font-size PT` | node text size before fitting (12) |
+| `--direction TB\|BT\|LR\|RL` | flowcharts: override the diagram's direction |
+| `--font-size PT` | text size before fitting (12) |
 | `--font NAME` | fixed font instead of the theme font |
 | `--render mermaid\|bpmn` | Flowcharts. `mermaid` (default): the flowchart's own shapes. `bpmn`: drawn like a BPMN process, see below |
 | `--no-events` | `bpmn`: don't add the start and end events the diagram lacks |
@@ -162,7 +176,7 @@ it has no end event, one is added after each node without an outgoing flow (`--n
 turn this off). The diagram's direction is kept; BPMN is usually drawn left to right,
 `--direction LR` does that.
 
-## Mermaid covered
+## Flowchart syntax covered
 
 - `flowchart` / `graph`, directions `TB TD BT LR RL`. Front matter, `%%` comments, `;` statement separators and ```` ``` ```` fences are all accepted.
 - Node shapes: `[rect]` `(round)` `([stadium])` `[[subroutine]]` `[(database)]` `((circle))`
@@ -176,13 +190,45 @@ turn this off). The diagram's direction is kept; BPMN is usually drawn left to r
   `stroke-width`, `stroke-dasharray` (`0` = solid), `color`. A `classDef` fill or stroke wins over
   `--color`; other CSS (`rx`, `ry`, …) is ignored.
 
-Not covered: every other diagram type (sequence, class, state, gantt…), the v11 `A@{ shape: … }`
-syntax, `click`, and per-subgraph `direction` (ignored). An `x` end marker is drawn as a diamond,
-because PowerPoint has no cross arrowhead.
+Not covered: the v11 `A@{ shape: … }` syntax, `click`, and per-subgraph `direction` (ignored). An
+`x` end marker is drawn as a diamond, because PowerPoint has no cross arrowhead.
+
+## Sequence diagrams
+
+- `participant` and `actor` (a figure over the name), with `as` aliases; participants met in a
+  message are added in order. Each is drawn at the top and again at the bottom, joined by a dashed
+  lifeline glued to both boxes.
+- Messages `->` `-->` `->>` `-->>` `-x` `--x` `-)` `--)` `<<->>` `<<-->>` (solid or dotted, with
+  an arrow, an open arrow, a cross or nothing), to another participant or to oneself (a loop).
+- Activation bars: `+`/`-` on a message, or `activate` / `deactivate`; nested bars step right.
+- `Note left of | right of | over A[,B]`, drawn as folded-corner notes.
+- Blocks `loop`, `alt`/`else`, `opt`, `par`/`and`, `critical`/`option`, `break`, nested;
+  `rect rgb(…)` as a coloured background; `box Colour Label … end` around participants.
+- `autonumber` (a numbered badge at the start of each message) and `title`.
+
+Not covered: `create`/`destroy` (the participant is drawn from top to bottom, with a warning for
+`destroy`), `links`, and the v11 participant types (`@{ "type": … }`, drawn as participants).
+
+## Gantt charts
+
+- `title`, `dateFormat` (dayjs tokens: `YYYY-MM-DD` by default, `DD/MM/YYYY HH:mm`, `D MMM YY`…),
+  `axisFormat` (`%d %b`, `%Y-%m-%d` by default, `%H:%M`…), `tickInterval` (`1week`, `1month`…),
+  `weekday`, `section`.
+- Tasks `Name : [done|active|crit|milestone,] [id,] [start,] end`, where start is a date or
+  `after id1 id2`, and end is a date, a duration (`3d`, `2w`, `12h`, `30m`, `1M`) or `until id`.
+  Without a start, a task follows the one before it.
+- `excludes weekends`, day names or dates (and `includes` exceptions): durations skip those days,
+  which are shaded on the chart. `inclusiveEndDates`.
+- One row per task; sections as alternating bands with their name on the left; the task's name on
+  its bar when it fits, beside it otherwise. Done, active and critical tasks have their own colours
+  in every palette.
+
+Not covered: `click`, `todayMarker` (a slide has no "today"), `displayMode compact`, and dependency
+arrows (Mermaid draws none either).
 
 ## Layout, in short
 
-A layered (Sugiyama-style) layout, implemented in the script itself:
+Flowcharts use a layered (Sugiyama-style) layout, implemented in `src/mermaid2pptx/flowchart/layout/`:
 
 1. Break cycles (the edge written last closes the cycle).
 2. Rank nodes by longest path. An edge with a label spans two ranks, so its label gets its own slot.
@@ -208,13 +254,13 @@ python3 install.py dev             # Windows: py install.py dev
 
 GitHub Actions runs them on Windows, Linux and macOS, with Python 3.10 and 3.13, on every push.
 
-The tests cover the parser, and a check that each connector's geometry draws its route: the
+The tests cover the three parsers, and a check that each connector's geometry draws its route: the
 path is rebuilt from the XML (preset path, then flip, then rotation) independently of the
 converter. On every example in `examples/` in every direction, they also check that nodes never
 overlap, that routes stay orthogonal and never cross a node, and that each connector end, as
 drawn, lands on the connection site it is glued to.
 
-The connection-site indices in `SHAPES` were measured in PowerPoint through COM
+The connection-site indices in `flowchart/shapes.py` were measured in PowerPoint through COM
 (`ConnectionSiteCount` / `BeginConnect`), and the examples were checked by rendering them in
 PowerPoint and moving a node to confirm the glue holds.
 
@@ -225,7 +271,9 @@ Bug reports (with the Mermaid input) and pull requests are welcome: see
 
 ## Releasing
 
-Bump `__version__` in `src/mermaid2pptx/__init__.py`, commit, then `git tag v1.2.3 && git push --tags`.
+Bump `__version__` in `src/mermaid2pptx/__init__.py` and merge it into `main`, then tag that merged
+commit: `git switch main && git pull && git tag v1.2.3 && git push origin v1.2.3`. The workflow stops
+at once if the tag and `__version__` differ (a tag on a commit that still has the old version).
 The `release` workflow runs the tests, builds one standalone executable per system with
 PyInstaller, runs each on an example, attaches them to a GitHub release, and publishes the
 package to PyPI. Record the changes in [CHANGELOG.md](https://github.com/JeanMichelDurand/mermaid2pptx/blob/main/CHANGELOG.md) first.
