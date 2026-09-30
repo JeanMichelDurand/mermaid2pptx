@@ -48,6 +48,10 @@
   button:disabled { opacity: .5; cursor: wait; }
   .file { background: transparent; color: var(--accent); }
   .file input { display: none; }
+  .file.small { font-weight: 400; padding: 6px 10px; }
+  button.link { background: none; border: none; padding: 0; color: var(--accent); font-weight: 400;
+                text-decoration: underline; }
+  #template-name { color: var(--text); }
   #status { margin-top: 12px; white-space: pre-wrap; min-height: 1.5em; }
   #status.error { color: var(--error); }
   #status .warn { color: var(--warn); }
@@ -91,7 +95,7 @@
       <select id="color">
         <option value="purple">Purple</option>
         <option value="slate">Slate (light grey)</option>
-        <option value="theme">Theme (adopts the target deck's colours)</option>
+        <option value="theme">Theme (the template's, or the target deck's when pasted)</option>
       </select>
     </label>
     <label>Direction
@@ -106,6 +110,13 @@
     <label>Markdown block
       <input id="block" type="number" min="1" value="1">
     </label>
+    <label title="The .pptx takes this deck's theme (colours, fonts) and slide size">Template (optional)
+      <span class="row">
+        <span class="file small">Choose a .pptx / .potx…<input id="template" type="file" accept=".pptx,.potx"></span>
+        <span id="template-name">none</span>
+        <button id="template-clear" class="link" hidden>remove</button>
+      </span>
+    </label>
   </div>
 
   <div class="row">
@@ -116,6 +127,7 @@
 
   <footer>
     Open the downloaded .pptx, click the diagram (one group), copy it and paste it into your slide.
+    With the Theme colours, choose your company template to see its colours in the download too.
     The first conversion loads Python in the page (about 15 MB, cached afterwards).
     <a href="https://github.com/JeanMichelDurand/mermaid2pptx">Source, command-line version and documentation</a>.
     MIT licence, provided as is, without warranty.
@@ -128,6 +140,7 @@
 const $ = (id) => document.getElementById(id);
 const status = (text, cls = "") => { $("status").className = cls; $("status").textContent = text; };
 let fileName = "diagram";
+let template = null;                      // the chosen template deck's bytes, if any
 
 // ---- Mermaid preview -------------------------------------------------------------------------
 mermaid.initialize({ startOnLoad: false, theme: "default" });
@@ -160,6 +173,20 @@ async function loadFile(file) {
 $("src").addEventListener("input", schedulePreview);
 $("block").addEventListener("input", schedulePreview);
 $("file").addEventListener("change", (e) => e.target.files[0] && loadFile(e.target.files[0]));
+function setTemplate(file, bytes) {
+  template = bytes;
+  $("template-name").textContent = file ? file.name : "none";
+  $("template-clear").hidden = !file;
+  if (!file) $("template").value = "";
+}
+$("template").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  setTemplate(file, new Uint8Array(await file.arrayBuffer()));
+  $("color").value = "theme";                                     // why one picks a template
+  status(`Template ${file.name}: the .pptx takes its theme and slide size (colours set to Theme).`);
+});
+$("template-clear").addEventListener("click", () => setTemplate(null, null));
 $("src").addEventListener("dragover", (e) => { e.preventDefault(); $("src").classList.add("drop"); });
 $("src").addEventListener("dragleave", () => $("src").classList.remove("drop"));
 $("src").addEventListener("drop", (e) => {
@@ -199,8 +226,10 @@ async function convert() {
   status("Converting…");
   try {
     const py = await pyReady;
+    if (template) py.FS.writeFile("/tmp/template.pptx", template);
     const opts = { render: $("render").value, color: $("color").value, aspect: $("aspect").value,
-                   direction: $("direction").value || null, block: +$("block").value || 1 };
+                   direction: $("direction").value || null, block: +$("block").value || 1,
+                   template: template ? "/tmp/template.pptx" : "" };
     const res = JSON.parse(py.globals.get("run")($("src").value, JSON.stringify(opts)));
     const data = py.FS.readFile("/tmp/out.pptx");
     const url = URL.createObjectURL(new Blob([data], {

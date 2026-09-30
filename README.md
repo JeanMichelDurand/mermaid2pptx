@@ -111,8 +111,12 @@ Input files are read as UTF-8 (with or without BOM).
 
 ## What you get
 
-- **No template.** The file is python-pptx's built-in blank deck: one slide, blank layout,
-  no placeholders. Shapes carry no theme style reference, so a paste brings no stray
+- **Your template, or none.** By default the file is python-pptx's built-in blank deck: one
+  slide, blank layout, no placeholders. With `--template DECK` (or the `MERMAID2PPTX_TEMPLATE`
+  environment variable, which the Windows dialog also reads) it is that `.pptx` or `.potx`
+  emptied of its slides: its theme colours and fonts, its slide size (`--aspect` is ignored),
+  and the layout with the fewest placeholders, any left over removed. `--color theme` then
+  shows the template's colours in the file itself, not only once pasted. Shapes carry no theme style reference, so a paste brings no stray
   shadows or colours with it. The text uses the theme font unless `--font` is given, so it
   takes on the target deck's font when pasted with "Use destination theme".
 - **Real, editable objects.** Every node is an autoshape (rectangle, decision, terminator, database…)
@@ -142,9 +146,10 @@ Input files are read as UTF-8 (with or without BOM).
 | `--render mermaid\|bpmn` | Flowcharts. `mermaid` (default): the flowchart's own shapes. `bpmn`: drawn like a BPMN process, see below |
 | `--no-events` | `bpmn`: don't add the start and end events the diagram lacks |
 | `--no-lanes` | `bpmn`: draw top-level subgraphs as groups, never as lanes |
-| `--color NAME\|#RRGGBB` | box colours. `purple` (default): `#5236AB` with white text. `slate`: light grey boxes. `theme`: theme colours (background 1, accent 1, text 1), so the paste recolours with the target deck. `#RRGGBB`: boxes in that colour, with black or white text for contrast |
+| `--color NAME\|#RRGGBB` | box colours. `purple` (default): `#5236AB` with white text. `slate`: light grey boxes. `theme`: theme colours (background 1, accent 1, text 1), so the paste recolours with the target deck, and the file shows the `--template` deck's. `#RRGGBB`: boxes in that colour, with black or white text for contrast |
 | `--author NAME` | document author (default: `$MERMAID2PPTX_AUTHOR`, else empty) |
-| `--aspect 16:9\|4:3` | slide shape |
+| `--template DECK` | `.pptx` or `.potx` whose theme and slide size the file takes (default: `$MERMAID2PPTX_TEMPLATE`, else none; `""` = none) |
+| `--aspect 16:9\|4:3` | slide shape, without a template |
 | `--no-fit` | natural size; the slide grows to fit the diagram |
 | `--no-group` | shapes left ungrouped |
 | `--version` | print the version |

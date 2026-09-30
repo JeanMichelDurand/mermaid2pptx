@@ -6,6 +6,15 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Theme colours had no theme to show.** The file was always built on python-pptx's
+  Office deck, so `--color theme` showed Office blue until pasted, with no way to give it your
+  deck's theme. `--template DECK` (a `.pptx` or `.potx`, or the `MERMAID2PPTX_TEMPLATE`
+  environment variable, read by the Windows executable's dialog too) builds the file on that
+  deck: its theme colours and fonts, its slide size, none of its slides. The browser version
+  has a "Template" picker, and choosing one selects the Theme colours.
+
 ## [1.1.0] - 2026-09-29
 
 ### Changed
