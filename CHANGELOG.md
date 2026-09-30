@@ -6,9 +6,29 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
-## [1.0.2] - 2026-09-29
+## [1.1.0] - 2026-09-29
+
+### Changed
+
+- **Flowcharts are drawn with their own Mermaid shapes by default.** The BPMN reading (gateways,
+  events, swim lanes, added start and end events) is now opt-in: `--render bpmn`. To keep the
+  1.0 output, add `--render bpmn` to your commands.
+- The code is a package (`src/mermaid2pptx/`, one folder per diagram type) instead of one
+  file, with no file over 500 lines; `CONTRIBUTING.md` has the map. `python -m mermaid2pptx`
+  works, and `import mermaid2pptx` keeps `convert`, `Options` and `MermaidError`.
+- The summary line counts in the singular when there is one: `1 edge`.
 
 ### Added
+
+- **Sequence diagrams** (`sequenceDiagram`): participants and actors, dashed lifelines glued to
+  the participant boxes (drawn again at the bottom), every Mermaid arrow (`->>`, `-->>`, `-x`,
+  `-)`, `<<->>`…), messages to oneself, activation bars (`+`/`-`, `activate`), notes,
+  `loop`/`alt`/`opt`/`par`/`critical`/`break` blocks, `rect` backgrounds, `box` groups,
+  `autonumber` and `title`. Example: `examples/sequence.mmd`.
+- **Gantt charts** (`gantt`): sections as bands, a time axis with automatic ticks (or
+  `tickInterval`), `dateFormat` and `axisFormat`, tasks by date, duration, `after` and `until`,
+  `done`/`active`/`crit` bars and milestones, `excludes weekends` (and days, dates) with the
+  excluded days shaded. Example: `examples/gantt.mmd`.
 
 - A browser version, published on GitHub Pages: https://jeanmicheldurand.github.io/mermaid2pptx/. It runs the converter
   in the page with Pyodide, for users who cannot install or run programs.
@@ -46,7 +66,7 @@ All notable changes to this project are recorded here. The format follows
 - Document author from `--author` or `MERMAID2PPTX_AUTHOR`.
 - Standalone executables for Windows, Linux and macOS, and a PyPI package.
 
-[Unreleased]: ../../compare/v1.0.2...HEAD
-[1.0.2]: ../../compare/v1.0.1...v1.0.2
+[Unreleased]: ../../compare/v1.1.0...HEAD
+[1.1.0]: ../../compare/v1.0.1...v1.1.0
 [1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0

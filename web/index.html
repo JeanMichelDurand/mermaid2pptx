@@ -57,7 +57,8 @@
 <body>
 <main>
   <h1>mermaid2pptx</h1>
-  <p class="lead">Turn a Mermaid flowchart into native, editable PowerPoint shapes. Runs entirely in your
+  <p class="lead">Turn a Mermaid flowchart, sequence diagram or Gantt chart into native, editable
+    PowerPoint shapes. Runs entirely in your
     browser: nothing to install, and your diagram never leaves your computer.</p>
 
   <div class="grid">
@@ -72,10 +73,18 @@
   </div>
 
   <div class="options">
+    <label>Example
+      <select id="example">
+        <option value="flowchart">Flowchart: leave request</option>
+        <option value="incident_lanes">Flowchart as BPMN: incident, with swim lanes</option>
+        <option value="sequence">Sequence diagram: leave request</option>
+        <option value="gantt">Gantt chart: onboarding</option>
+      </select>
+    </label>
     <label>Drawing
       <select id="render">
-        <option value="bpmn">BPMN process (default)</option>
-        <option value="mermaid">Mermaid shapes</option>
+        <option value="mermaid">Mermaid shapes (default)</option>
+        <option value="bpmn">BPMN process (flowcharts)</option>
       </select>
     </label>
     <label>Colours
@@ -158,7 +167,7 @@ $("src").addEventListener("drop", (e) => {
   if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
 });
 
-// ---- Python: the converter itself, mermaid2pptx.py, run by Pyodide ---------------------------
+// ---- Python: the converter itself, the mermaid2pptx wheel, run by Pyodide ---------------------
 const GLUE = `
 import io, json
 import mermaid2pptx as m
@@ -171,14 +180,14 @@ def run(src, opts):
         raise m.MermaidError(f"Markdown block {block}: the input has {len(blocks)} mermaid block(s)")
     prs, d, _ = m.convert(blocks[block - 1], m.Options(**o))
     prs.save("/tmp/out.pptx")
-    summary = f"{len(d.nodes)} nodes, {len(d.edges)} edges, {len(d.subgraphs)} subgraphs"
-    return json.dumps({"summary": summary, "warnings": d.warnings})
+    return json.dumps({"summary": d.summary(), "warnings": d.warnings})
 `;
 const pyReady = (async () => {
   const py = await loadPyodide();
   await py.loadPackage(["micropip", "lxml", "pillow"]);
-  await py.pyimport("micropip").install("python-pptx>=1.0.2,<2");
-  py.FS.writeFile("mermaid2pptx.py", await (await fetch("mermaid2pptx.py")).text());
+  // wheel.txt names the wheel the pages workflow built next to this page; python-pptx comes from PyPI
+  const wheel = (await (await fetch("wheel.txt")).text()).trim();
+  await py.pyimport("micropip").install(new URL(wheel, location.href).href);
   py.runPython(GLUE);
   return py;
 })();
@@ -214,12 +223,22 @@ async function convert() {
 }
 $("convert").addEventListener("click", convert);
 
-// ---- Start with an example; #selftest converts it at once (used by CI and docs/screenshots) ----
-fetch("examples/incident_lanes.mmd").then((r) => r.ok ? r.text() : "")
-  .then((t) => { $("src").value = t || "graph TD\n  A[Start] --> B{Choice?}\n  B -->|Yes| C[Do it]\n  B -->|No| D[Skip]";
-                 fileName = t ? "incident_lanes" : "diagram"; schedulePreview();
-                 if (location.hash === "#selftest")          // report to the serving process's log
-                   convert().then(() => fetch("selftest?" + encodeURIComponent(document.title))); });
+// ---- Examples; #selftest converts one at once (used by CI and docs/screenshots) ----------------
+async function loadExample(name) {
+  const r = await fetch(`examples/${name}.mmd`);
+  $("src").value = r.ok ? await r.text() : "graph TD\n  A[Start] --> B{Choice?}\n  B -->|Yes| C[Do it]\n  B -->|No| D[Skip]";
+  fileName = r.ok ? name : "diagram";
+  $("render").value = name === "incident_lanes" ? "bpmn" : "mermaid";     // the BPMN example needs its drawing
+  schedulePreview();
+}
+$("example").addEventListener("change", () => loadExample($("example").value));
+const hash = new URLSearchParams(location.hash.slice(1));        // #selftest, or #selftest=gantt
+const selftest = hash.has("selftest");
+if (hash.get("selftest")) $("example").value = hash.get("selftest");
+loadExample($("example").value).then(() => {
+  if (selftest)                                               // report to the serving process's log
+    convert().then(() => fetch("selftest?" + encodeURIComponent(document.title)));
+});
 </script>
 </body>
 </html>

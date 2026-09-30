@@ -1,0 +1,25 @@
+sequenceDiagram
+    title Leave request
+    autonumber
+    actor E as Employee
+    participant P as HR portal
+    participant M as Manager
+    participant DB as HR database
+
+    E->>+P: Submit a leave request
+    P->>DB: Check the remaining days
+    DB-->>P: 12 days left
+    P->>+M: Ask for approval
+    Note right of M: Checks the team calendar
+    alt enough people in the team
+        M-->>P: Approve
+        P->>DB: Record the leave
+    else too many people away
+        M--xP: Reject, with a reason
+    end
+    deactivate M
+    loop every Monday until answered
+        P->>P: Send a reminder
+    end
+    P-->>-E: Decision by e-mail
+    Note over E,P: The employee can cancel until the day before

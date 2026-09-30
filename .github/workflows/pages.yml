@@ -1,4 +1,4 @@
-# Publishes the browser version (web/index.html + mermaid2pptx.py + examples/) to GitHub Pages
+# Publishes the browser version (web/index.html + the package's wheel + examples/) to GitHub Pages
 # on every release tag, so the web page always runs the latest released converter.
 # One-time setup: Settings -> Pages -> Source: GitHub Actions.
 name: pages
@@ -24,11 +24,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
       - name: assemble the site
         run: |
           mkdir -p site/examples
-          cp web/index.html mermaid2pptx.py site/
+          python -m pip wheel --no-deps --wheel-dir site .
+          (cd site && ls *.whl > wheel.txt)          # the page installs the wheel this file names
+          cp web/index.html site/
           cp examples/*.mmd site/examples/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

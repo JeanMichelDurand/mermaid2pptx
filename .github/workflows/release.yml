@@ -1,4 +1,4 @@
-# Push a tag matching the version in mermaid2pptx.py (git tag v1.0.0 && git push --tags):
+# Push a tag matching __version__ in src/mermaid2pptx/__init__.py (git tag v1.0.0 && git push --tags):
 # builds one standalone executable per OS (no Python needed to run it) and attaches them
 # to a GitHub release.
 name: release
@@ -39,12 +39,12 @@ jobs:
           python-version: "3.12"
       - name: tag matches the version
         run: |
-          version=$(python -c "import ast, sys; t = ast.parse(open('mermaid2pptx.py', encoding='utf-8').read()); print(next(n.value.value for n in t.body if isinstance(n, ast.Assign) and n.targets[0].id == '__version__'))")
+          version=$(python -c "import ast, sys; t = ast.parse(open('src/mermaid2pptx/__init__.py', encoding='utf-8').read()); print(next(n.value.value for n in t.body if isinstance(n, ast.Assign) and n.targets[0].id == '__version__'))")
           test "v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME != v$version"; exit 1; }
       - run: python -m pip install -r requirements-dev.txt pyinstaller
       - run: python -m pytest
       - name: build
-        run: pyinstaller --onefile --name mermaid2pptx --collect-data pptx ${{ matrix.extra }} mermaid2pptx.py
+        run: pyinstaller --onefile --name mermaid2pptx --collect-data pptx ${{ matrix.extra }} --paths src src/mermaid2pptx/__main__.py
       - name: smoke test the executable
         run: |
           exe=$(ls dist/mermaid2pptx*)
@@ -54,7 +54,7 @@ jobs:
           mv "$exe" "dist/${{ matrix.asset }}"
       - id: unsigned
         if: env.SIGN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsigned-${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
@@ -76,7 +76,7 @@ jobs:
           if ($sig.Status -ne 'Valid') { throw "signature: $($sig.Status)" }
           Move-Item -Force "signed/${{ matrix.asset }}" "dist/${{ matrix.asset }}"
           & "dist/${{ matrix.asset }}" --version
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
