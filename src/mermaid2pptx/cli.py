@@ -9,7 +9,7 @@ from . import __doc__ as _doc, __version__
 from .convert import convert
 from .errors import MermaidError
 from .flowchart.parser import DIRECTIONS
-from .options import AUTHOR_ENV, SLIDE_SIZES, Options, palette
+from .options import AUTHOR_ENV, SLIDE_SIZES, TEMPLATE_ENV, Options, palette
 from .source import extract_blocks
 
 
@@ -33,7 +33,11 @@ def main(argv: list[str] | None = None) -> int:
                     help="box colours: purple (default), slate, theme (the target deck's "
                          "theme colours) or #RRGGBB")
     ap.add_argument("--author", help=f"document author (default: ${AUTHOR_ENV}, else empty)")
-    ap.add_argument("--aspect", choices=sorted(SLIDE_SIZES), default="16:9", help="slide shape (16:9)")
+    ap.add_argument("--template", metavar="DECK",
+                    help=".pptx or .potx whose theme (colours, fonts) and slide size the deck takes, so "
+                         f"--color theme shows its colours (default: ${TEMPLATE_ENV}, else python-pptx's blank deck)")
+    ap.add_argument("--aspect", choices=sorted(SLIDE_SIZES), default="16:9",
+                    help="slide shape (16:9), without --template")
     ap.add_argument("--no-fit", action="store_true",
                     help="keep the natural size and size the slide to the diagram instead of shrinking it")
     ap.add_argument("--no-group", action="store_true", help="leave the shapes ungrouped on the slide")
@@ -63,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
         ap.error(f"--color: {exc}")
     opts = Options(font_size=args.font_size, font=args.font, color=args.color, render=args.render,
                    events=not args.no_events, lanes=not args.no_lanes, author=args.author, group=not args.no_group,
-                   fit=not args.no_fit, aspect=args.aspect, direction=args.direction)
+                   fit=not args.no_fit, aspect=args.aspect, direction=args.direction, template=args.template)
     try:
         prs, d, _ = convert(blocks[args.block - 1], opts)
     except MermaidError as exc:

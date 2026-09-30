@@ -33,6 +33,7 @@ PALETTES = {
     },
 }
 AUTHOR_ENV = "MERMAID2PPTX_AUTHOR"      # default document author, when --author is not given
+TEMPLATE_ENV = "MERMAID2PPTX_TEMPLATE"  # default template deck, when --template is not given
 
 
 def palette(color: str) -> dict:
@@ -61,5 +62,7 @@ class Options:
     author: str | None = None           # None: $MERMAID2PPTX_AUTHOR, else empty
     group: bool = True
     fit: bool = True
-    aspect: str = "16:9"
+    aspect: str = "16:9"                # ignored with a template: its slide size wins
+    template: str | None = None         # .pptx/.potx whose theme and slide size the deck takes;
+                                        # None: $MERMAID2PPTX_TEMPLATE, else python-pptx's blank deck
     direction: str | None = None
