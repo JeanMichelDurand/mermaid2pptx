@@ -6,6 +6,8 @@ All notable changes to this project are recorded here. The format follows
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-30
+
 ### Fixed
 
 - **The Theme colours had no theme to show.** The file was always built on python-pptx's
@@ -75,7 +77,8 @@ All notable changes to this project are recorded here. The format follows
 - Document author from `--author` or `MERMAID2PPTX_AUTHOR`.
 - Standalone executables for Windows, Linux and macOS, and a PyPI package.
 
-[Unreleased]: ../../compare/v1.1.0...HEAD
+[Unreleased]: ../../compare/v1.1.1...HEAD
+[1.1.1]: ../../compare/v1.1.0...v1.1.1
 [1.1.0]: ../../compare/v1.0.1...v1.1.0
 [1.0.1]: ../../compare/v1.0.0...v1.0.1
 [1.0.0]: ../../releases/tag/v1.0.0
