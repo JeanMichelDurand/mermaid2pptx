@@ -59,7 +59,7 @@ jobs:
           name: unsigned-${{ matrix.asset }}
           path: dist/${{ matrix.asset }}
       - if: env.SIGN == 'true'
-        uses: signpath/github-action-submit-signing-request@v1
+        uses: signpath/github-action-submit-signing-request@v3
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
